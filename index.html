@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>⚒️ Engine6.0— Store</title>
+  <meta name="description" content="BlockRealm official Minecraft store (Java Edition)">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0a12;
+      --card: rgba(30, 20, 50, 0.85);
+      --muted: #9b89c6;
+      --text: #f2eaff;
+      --brand: #a76dff;
+      --brand-2: #d76dff;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    canvas.bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+
+    .wrap { max-width: 800px; margin: 0 auto; padding: 24px; }
+
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 16px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 42px; height: 42px; border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(180, 100, 255, 0.6);
+    }
+    .brand-logo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .brand h1 { margin: 0; font-size: 20px; }
+
+    .server-chip {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--card); padding: 10px 14px;
+      border-radius: 999px; border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+    }
+    .server-addr { font-weight: 700; color: var(--text); }
+
+    .btn {
+      border: none; border-radius: 12px;
+      padding: 10px 14px; font-weight: 600; cursor: pointer;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff; box-shadow: 0 0 15px rgba(160, 90, 255, 0.7);
+      transition: transform 0.15s;
+    }
+    .btn:hover { transform: scale(1.05); }
+
+    main { display: grid; gap: 20px; }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      padding: 22px;
+      backdrop-filter: blur(12px);
+    }
+
+    .muted { color: var(--muted); }
+    h2 { margin-top: 0; }
+
+    .coming-soon {
+      text-align: center; font-weight: 700; font-size: 18px;
+      color: var(--brand-2); padding: 30px 0;
+    }
+
+    .profile {
+      display: flex; align-items: center; gap: 14px; margin-top: 16px;
+    }
+    .profile img {
+      width: 64px; height: 64px; border-radius: 8px;
+      box-shadow: 0 0 12px rgba(180, 90, 255, 0.6);
+    }
+
+    input {
+      background: #140f26; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 12px; color: var(--text); outline: none; width: 100%;
+    }
+    input:focus {
+      border-color: var(--brand-2);
+      box-shadow: 0 0 0 3px rgba(200,100,255,0.3);
+    }
+
+    footer {
+      margin: 40px 0 20px; text-align: center; color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <canvas class="bg"></canvas>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <!-- Embedded E6 Logo -->
+        <div class="brand-logo">
+          <img src="https://cdn.discordapp.com/attachments/1384684145049075823/1413657119508660265/ChatGPT_Image_Sep_5_2025_05_35_15_PM.png?ex=68bcba49&is=68bb68c9&hm=bfbef587d8c0d28c4e872c9250a980505c9d187218f6ef91e469943267140c4b&" alt="Server Logo">
+        </div>
+        <div>
+          <h1>Engine6.0 mc Store</h1>
+          <div class="muted" style="font-size:13px">Official Java Edition server store</div>
+        </div>
+      </div>
+
+      <div class="server-chip">
+        <span>IP: <b class="server-addr" id="serverAddrText">Engine60.aternos.me</b></span>
+        <button class="btn" id="copyBtn">Copy IP</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="card">
+        <h2>Coming Soon</h2>
+        <p class="muted">Our ranks and packages will be available here soon. Stay tuned!</p>
+        <div class="coming-soon">✨ Store Under Construction ✨</div>
+      </div>
+
+      <div class="card">
+        <h2>Check Your Profile</h2>
+        <label for="mcName">Java Username</label>
+        <input id="mcName" placeholder="e.g. Notch" autocomplete="username">
+        <div id="profile" class="profile" style="display:none">
+          <img id="headImg" src="" alt="Player head">
+          <div>
+            <div style="font-weight:700" id="playerName"></div>
+            <div class="muted">Java Edition</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      © <span id="year"></span> BlockRealm Networks. Not affiliated with Mojang AB or Microsoft.
+    </footer>
+  </div>
+
+  <script>
+    const SERVER_ADDRESS = "play.blockrealm.gg";
+    const $ = (sel) => document.querySelector(sel);
+
+    $("#serverAddrText").textContent = SERVER_ADDRESS;
+    $("#year").textContent = new Date().getFullYear();
+
+    // Copy IP
+    $("#copyBtn").addEventListener("click", ()=>{
+      navigator.clipboard.writeText(SERVER_ADDRESS).then(()=>{
+        const old = $("#copyBtn").textContent;
+        $("#copyBtn").textContent = "Copied!";
+        setTimeout(()=> $("#copyBtn").textContent = old, 1200);
+      });
+    });
+
+    // Mojang API → UUID → Crafatar head
+    const mcName = $("#mcName");
+    mcName.addEventListener("input", async ()=>{
+      const name = mcName.value.trim();
+      if(/^[A-Za-z0-9_]{3,16}$/.test(name)){
+        try {
+          const res = await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`);
+          if(!res.ok) throw new Error("Not found");
+          const data = await res.json();
+          const uuid = data.id;
+
+          $("#profile").style.display = "flex";
+          $("#playerName").textContent = data.name;
+          $("#headImg").src = `https://crafatar.com/avatars/${uuid}?overlay`;
+        } catch(e){
+          $("#profile").style.display = "none";
+        }
+      } else {
+        $("#profile").style.display = "none";
+      }
+    });
+
+    // Animated background (particles + lines)
+    const canvas = document.querySelector("canvas.bg");
+    const ctx = canvas.getContext("2d");
+    let w, h;
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const particles = [];
+    for(let i=0;i<80;i++){
+      particles.push({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        vx: (Math.random()-0.5)*0.7,
+        vy: (Math.random()-0.5)*0.7
+      });
+    }
+
+    function animate(){
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = "rgba(167,109,255,0.8)";
+      particles.forEach(p=>{
+        p.x += p.vx;
+        p.y += p.vy;
+        if(p.x<0||p.x>w) p.
